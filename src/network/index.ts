@@ -1,0 +1,5 @@
+export { ProtocolFactory } from './factory'
+export { MockInterceptor } from './mock-interceptor'
+export { HttpAdapter } from './adapters/http'
+export { WsAdapter } from './adapters/websocket'
+export { MqttAdapter } from './adapters/mqtt'

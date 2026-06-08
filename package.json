@@ -1,0 +1,68 @@
+{
+  "name": "anyctrl",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AnyCtrl 控制面板 - 支持 H5/小程序/App 的跨端控制应用",
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "sass"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build:weapp": "taro build --type weapp",
+    "build:h5": "taro build --type h5",
+    "build:rn": "taro build --type rn",
+    "build:android": "pnpm build:h5 && npx cap sync android && cd android && gradlew.bat assembleDebug",
+    "dev:weapp": "pnpm build:weapp -- --watch",
+    "dev:h5": "pnpm build:h5 -- --watch",
+    "dev:rn": "pnpm build:rn -- --watch"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.21.5",
+    "@nutui/nutui-react-taro": "^3.0.20",
+    "@tarojs/components": "4.0.9",
+    "@tarojs/helper": "4.0.9",
+    "@tarojs/plugin-platform-h5": "4.0.9",
+    "@tarojs/plugin-platform-weapp": "4.0.9",
+    "@tarojs/react": "4.0.9",
+    "@tarojs/runtime": "4.0.9",
+    "@tarojs/shared": "4.0.9",
+    "@tarojs/taro": "4.0.9",
+    "mqtt": "^5.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.0",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-proposal-decorators": "^7.21.0",
+    "@babel/plugin-transform-runtime": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@babel/runtime-corejs3": "^7.29.7",
+    "@capacitor/android": "^7",
+    "@capacitor/cli": "^7",
+    "@capacitor/core": "^7",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@tarojs/cli": "4.0.9",
+    "@tarojs/plugin-framework-react": "4.0.9",
+    "@tarojs/webpack5-runner": "4.0.9",
+    "@types/react": "^18.2.0",
+    "babel-preset-taro": "4.0.9",
+    "eslint": "^8.41.0",
+    "eslint-config-taro": "4.0.9",
+    "react-refresh": "^0.14.2",
+    "sass": "^1.69.0",
+    "sharp": "^0.34.5",
+    "typescript": "^5.1.0",
+    "webpack": "5.91.0"
+  }
+}

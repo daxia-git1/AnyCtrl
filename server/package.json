@@ -1,0 +1,13 @@
+{
+  "name": "anyctrl-local-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AnyCtrl 控制面板 - 本地开发后端（Express，3 个 GET 端点，返回 ApiEnvelope 信封格式）",
+  "main": "local-server.js",
+  "scripts": {
+    "start": "node local-server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

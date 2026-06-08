@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AnyCtrl 控制面板</string>
+    <string name="title_activity_main">AnyCtrl 控制面板</string>
+    <string name="package_name">com.anyctrl.panel</string>
+    <string name="custom_url_scheme">com.anyctrl.panel</string>
+</resources>

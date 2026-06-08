@@ -1,0 +1,107 @@
+.panel-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0f2f5 0%, #e8ecf1 100%);
+  display: flex;
+  flex-direction: column;
+
+  &__scroll {
+    flex: 1;
+    height: calc(100vh - 100px);
+  }
+
+  &__content {
+    padding: 28px 32px;
+    padding-bottom: 100px;
+  }
+
+  &__error {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #fecaca;
+    border-radius: 20px;
+    padding: 32px 28px;
+    margin-bottom: 24px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+  }
+
+  &__error-text {
+    display: block;
+    font-size: calc(28px * var(--font-scale, 1));
+    color: #dc2626;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  &__retry {
+    display: inline-block;
+    font-size: calc(26px * var(--font-scale, 1));
+    color: #ffffff;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    padding: 12px 32px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+    }
+  }
+
+  &__loading {
+    text-align: center;
+    padding: 100px 0;
+  }
+
+  &__loading-text {
+    font-size: calc(28px * var(--font-scale, 1));
+    color: #94a3b8;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 100px 0;
+  }
+
+  &__empty-text {
+    display: block;
+    font-size: calc(30px * var(--font-scale, 1));
+    color: #94a3b8;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  &__refresh {
+    text-align: center;
+    padding: 36px 0;
+  }
+
+  &__refresh-text {
+    display: inline-block;
+    font-size: calc(26px * var(--font-scale, 1));
+    color: #6366f1;
+    font-weight: 600;
+    padding: 16px 40px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+
+    &:active {
+      background: #e0e7ff;
+      transform: scale(0.97);
+    }
+  }
+
+  &__end-line {
+    text-align: center;
+    padding: 40px 0 20px;
+  }
+
+  &__end-text {
+    font-size: calc(22px * var(--font-scale, 1));
+    color: #cbd5e1;
+    font-weight: 400;
+  }
+}
