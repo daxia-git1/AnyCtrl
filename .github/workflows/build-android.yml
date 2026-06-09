@@ -6,7 +6,7 @@ on:
     tags: ['v*']
   pull_request:
     branches: [main, master]
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,7 +22,6 @@ jobs:
         with:
           node-version: '20'
 
-      # 用 corepack 启用 pnpm（Node 16+ 自带，比 pnpm/action-setup 稳定）
       - name: Setup pnpm via corepack
         run: corepack enable && corepack prepare pnpm@9.15.0 --activate
 
@@ -37,8 +36,10 @@ jobs:
         with:
           api-level: 34
           build-tools-version: '34.0.0'
-          # 让 Gradle 找得到 SDK
           local-cache: false
+
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/anyctrl-release.keystore
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -46,18 +47,23 @@ jobs:
       - name: Build H5
         run: pnpm build:h5
 
-      - name: Sync Capacitor (copy web assets → android/)
+      - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build Debug APK
+      - name: Build Release APK
         working-directory: android
+        env:
+          KEYSTORE_PATH: ../anyctrl-release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: anyctrl-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: anyctrl-release
+          path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
