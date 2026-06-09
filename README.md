@@ -188,6 +188,10 @@ pnpm build:h5          # H5
 pnpm build:rn          # App
 ```
 
+## 界面展示
+![alt text](docs/控制界面.jpg) ![alt text](docs/设置界面.jpg) ![alt text](docs/首页界面.jpg)
+
+
 ## License
 
 本项目基于 [MIT 协议](./LICENSE) 开源，这是主流开源协议中最 Open 的协议。你可以自由使用、修改、商用、闭源，MIT 唯一的要求是**保留版权声明和许可声明**，全球一致。
