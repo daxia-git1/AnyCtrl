@@ -8,6 +8,9 @@
     "start": "node local-server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "aedes": "^0.51.3",
+    "express": "^4.19.2",
+    "websocket-stream": "^5.5.2",
+    "ws": "^8.18.0"
   }
 }

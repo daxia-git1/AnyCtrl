@@ -28,10 +28,10 @@ export class HttpAdapter implements IProtocolAdapter {
       await this.getHealth()
       this.setStatus('connected')
     } catch {
-      this.setStatus('error')
-      throw new Error('HTTP 连接失败: 无法访问服务')
+        this.setStatus('error')
+        throw new Error('HTTP 连接失败: 无法访问服务')
+      }
     }
-  }
 
   disconnect(): void {
     this.baseUrl = ''

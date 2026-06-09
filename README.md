@@ -189,9 +189,9 @@ pnpm build:rn          # App
 ```
 
 ## 界面展示
-![控制界面](docs/control.jpg)
-![设置界面](docs/settings.jpg)
-![首页界面](docs/home.jpg)
+![首页界面](docs/assert/home.jpg)
+![控制界面](docs/assert/control.jpg)
+![设置界面](docs/assert/settings.jpg)
 
 
 ## License
