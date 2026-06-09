@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.anyctrl.panel',
-  appName: 'AnyCtrl 控制面板',
+  appName: 'AnyCtrlPanel',
   webDir: 'dist',
   // Android 特定：允许 WebView 加载任意 URL
   android: {

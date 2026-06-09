@@ -52,6 +52,7 @@ temp/
 .swc/
 
 # AI/IDE 工具目录
+.claude/
 .qoder/
 .trae/
 

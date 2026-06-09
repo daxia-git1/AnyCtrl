@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "AnyCtrl 控制面板 - 支持 H5/小程序/App 的跨端控制应用",
+  "license": "MIT",
   "templateInfo": {
     "name": "default",
     "typescript": true,
