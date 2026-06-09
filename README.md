@@ -189,7 +189,9 @@ pnpm build:rn          # App
 ```
 
 ## 界面展示
-![alt text](docs/控制界面.jpg) ![alt text](docs/设置界面.jpg) ![alt text](docs/首页界面.jpg)
+![控制界面](docs/control.jpg)
+![设置界面](docs/settings.jpg)
+![首页界面](docs/home.jpg)
 
 
 ## License
