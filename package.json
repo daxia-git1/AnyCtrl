@@ -1,6 +1,6 @@
 {
   "name": "anyctrl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "AnyCtrl 控制面板 - 支持 H5/小程序/App 的跨端控制应用",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "@tarojs/runtime": "4.0.9",
     "@tarojs/shared": "4.0.9",
     "@tarojs/taro": "4.0.9",
-    "mqtt": "^5.10.0",
+    "mqtt": "^5.15.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.5.0"

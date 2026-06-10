@@ -26,9 +26,11 @@ export class MqttAdapter implements IProtocolAdapter {
 
     try {
       // 动态导入 mqtt.js（减小包体积）
-      const mqtt = await import('mqtt/dist/mqtt.min')
+      const mqttModule = await import('mqtt')
+      const mqtt = (mqttModule as any).default || mqttModule
 
-      const brokerUrl = `wss://${config.mqttHost}:${config.mqttPort}/mqtt`
+      const scheme = config.mqttHost === 'localhost' || config.mqttHost === '127.0.0.1' ? 'ws' : 'wss'
+      const brokerUrl = `${scheme}://${config.mqttHost}:${config.mqttPort}/mqtt`
 
       this.client = mqtt.connect(brokerUrl, {
         username: config.username,

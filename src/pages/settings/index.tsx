@@ -296,6 +296,12 @@ export default function SettingsPage() {
           <View className="settings-page__end-line">
             <Text className="settings-page__end-text">— 已经到底了 —</Text>
           </View>
+
+          {/* 版权信息 */}
+          <View className="settings-page__copyright">
+            <Text className="settings-page__copyright-text">AnyCtrl · AntsTeam</Text>
+            <Text className="settings-page__copyright-version">v1.0.1</Text>
+          </View>
         </View>
       </ScrollView>
       <CustomTabBar currentTab="settings" />

@@ -260,6 +260,26 @@
     color: #cbd5e1;
     font-weight: 400;
   }
+
+  &__copyright {
+    text-align: center;
+    padding: 8px 0 32px;
+  }
+
+  &__copyright-text {
+    display: block;
+    font-size: calc(22px * var(--font-scale, 1));
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  &__copyright-version {
+    display: block;
+    font-size: calc(20px * var(--font-scale, 1));
+    color: #cbd5e1;
+    margin-top: 4px;
+  }
 }
 
 @keyframes save-pulse {

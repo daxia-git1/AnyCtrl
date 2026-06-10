@@ -188,6 +188,18 @@ pnpm build:h5          # H5
 pnpm build:rn          # App
 ```
 
+## 文档
+
+| 文档 | 说明 |
+|------|------|
+| [架构设计](docs/ARCHITECTURE.md) | 分层架构、模块职责、数据流 |
+| [架构图](docs/ARCHITECTURE.svg) | 系统架构可视化 |
+| [API 总览](docs/api-contract.md) | 三种协议接口约定概览 |
+| [HTTP API](docs/api-contract-http.md) | HTTP REST 接口详细说明 |
+| [WebSocket API](docs/api-contract-websocket.md) | WebSocket 消息协议说明 |
+| [MQTT API](docs/api-contract-mqtt.md) | MQTT Topic 与消息格式 |
+| [版本变更](docs/CHANGELOG.md) | 版本升级记录与配置备忘 |
+
 ## 界面展示
 ![首页界面](docs/assert/home.jpg)
 ![控制界面](docs/assert/control.jpg)

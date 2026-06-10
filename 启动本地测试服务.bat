@@ -1,12 +1,14 @@
 @echo off
-title AnyCtrl 控制面板 - 一键启动
+title AnyCtrl 本地测试 - 一键启动
 
 cd /d "%~dp0"
 
 echo ==========================================
-echo  AnyCtrl 控制面板 - 一键启动
-echo    - Mock 后端 : http://localhost:3000
-echo    - 前端 H5   : http://localhost:8080
+echo  AnyCtrl 本地测试服务 - 一键启动
+echo    - HTTP  : http://localhost:3000
+echo    - WS    : ws://localhost:3001
+echo    - MQTT  : ws://localhost:1883
+echo    - H5    : http://localhost:8080
 echo ==========================================
 echo.
 
@@ -30,9 +32,9 @@ if errorlevel 1 goto fail
 :build_ok
 echo [2/4] H5 dist 已就绪
 
-REM 3. 启动本地后端（用 PowerShell 新窗口）
+REM 3. 启动本地后端（新 PowerShell 窗口）
 echo.
-echo [3/4] 启动本地后端 :3000 ...
+echo [3/4] 启动本地后端 :3000 :3001 :1883 ...
 start "AnyCtrl-LocalBackend" powershell -NoExit -Command "node '%~dp0server\local-server.js'"
 
 REM 4. 启动 H5 静态服务器
@@ -47,15 +49,17 @@ ping 127.0.0.1 -n 4 >nul
 
 echo.
 echo ============================================
-echo  全部已启动！
+echo  全部服务已启动！
 echo.
 echo    前端: http://localhost:8080
-echo    后端: http://localhost:3000
+echo    HTTP: http://localhost:3000
+echo    WS  : ws://localhost:3001
+echo    MQTT: ws://localhost:1883
 echo.
-echo  关闭：手动关闭命令行窗口 AnyCtrl-LocalBackend / AnyCtrl-Frontend
-echo  故障注入：set MOCK_TRIGGER_FAIL=4001 ^&^& node server\local-server.js
+echo  关闭：手动关闭两个新窗口 AnyCtrl-LocalBackend / AnyCtrl-Frontend
+echo  错误注入：set MOCK_TRIGGER_FAIL=4001 ^&^& node server\local-server.js
 echo.
-echo  按任意键退出（不会关闭后台服务）
+echo  按任意键退出此窗口（不会关闭后台服务）
 echo ============================================
 pause >nul
 exit /b 0
