@@ -11,8 +11,8 @@ function getUptime() {
   return Math.floor((Date.now() - bootTime) / 1000)
 }
 
-/** Mock 按钮数据 - 按标签分组 */
-const buttons = [
+/** 基础按钮组（三种协议共享） */
+const baseButtons = [
   {
     tagId: 'tag_lighting',
     tagName: '照明控制',
@@ -41,29 +41,76 @@ const buttons = [
       { id: 'btn_camera', action: '监控', description: '查看实时画面' },
     ],
   },
-  {
-    tagId: 'tag_media',
-    tagName: '媒体控制',
-    buttons: [
-      { id: 'btn_movie', action: '观影', description: '家庭影院模式' },
-      { id: 'btn_music', action: '音乐', description: '播放背景音乐' },
-      { id: 'btn_game',  action: '游戏', description: '游戏氛围模式' },
-    ],
-  },
 ]
 
-/** Mock 健康状态（uptime 动态计算） */
-function getHealth() {
+/** 每种协议的独有按钮组 */
+const protocolExtraButtons = {
+  http: {
+    tagId: 'tag_scene',
+    tagName: '场景联动',
+    buttons: [
+      { id: 'btn_go_home',   action: '回家模式', description: '灯光+空调+音乐一键开启' },
+      { id: 'btn_leave',     action: '离家模式', description: '全关+布防一键搞定' },
+      { id: 'btn_goodnight', action: '晚安模式', description: '关灯+锁门+夜灯' },
+    ],
+  },
+  ws: {
+    tagId: 'tag_realtime',
+    tagName: '实时调节',
+    buttons: [
+      { id: 'btn_bright_up',   action: '亮度+', description: '灯光亮度增加 10%' },
+      { id: 'btn_bright_down', action: '亮度-', description: '灯光亮度降低 10%' },
+      { id: 'btn_temp_adj',    action: '温度微调', description: '空调温度 +1°C' },
+    ],
+  },
+  mqtt: {
+    tagId: 'tag_schedule',
+    tagName: '定时任务',
+    buttons: [
+      { id: 'btn_timer_on',  action: '定时开灯',  description: '每天 18:00 自动开灯' },
+      { id: 'btn_timer_off', action: '定时关灯',  description: '每天 23:00 自动关灯' },
+      { id: 'btn_timer_ac',  action: '定时空调',  description: '每天 14:00 自动制冷' },
+    ],
+  },
+}
+
+/** 协议差异化配置 */
+const protocolProfiles = {
+  http: { version: '1.0.0-http', channel: 'HTTP',      deviceCount: 8,  activeDevices: 6  },
+  ws:   { version: '1.0.0-ws',   channel: 'WebSocket', deviceCount: 12, activeDevices: 10 },
+  mqtt: { version: '1.0.0-mqtt', channel: 'MQTT',      deviceCount: 15, activeDevices: 13 },
+}
+
+function getHealthByProtocol(protocol) {
+  const profile = protocolProfiles[protocol] || protocolProfiles.http
   return {
     status: 'online',
     uptime: getUptime(),
     lastCheck: Date.now(),
     details: {
-      version: '1.0.0-mock',
-      deviceCount: 8,
-      activeDevices: 6,
+      version: profile.version,
+      channel: profile.channel,
+      deviceCount: profile.deviceCount,
+      activeDevices: profile.activeDevices,
     },
   }
 }
 
-module.exports = { buttons, getHealth, getUptime }
+function getButtonsByProtocol(protocol) {
+  const extra = protocolExtraButtons[protocol]
+  return extra ? [...baseButtons, extra] : [...baseButtons]
+}
+
+/** 所有协议的按钮合集（用于校验 buttonId 是否存在） */
+function allButtons() {
+  return [...baseButtons, ...Object.values(protocolExtraButtons)]
+}
+
+module.exports = {
+  buttons: baseButtons,
+  getHealth: () => getHealthByProtocol('http'),
+  getUptime,
+  getHealthByProtocol,
+  getButtonsByProtocol,
+  allButtons,
+}

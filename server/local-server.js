@@ -1,9 +1,9 @@
 /**
  * AnyCtrl 控制面板 - 本地开发后端
- * 跑在 :3000，同时提供 HTTP / WebSocket / MQTT over WebSocket 三种协议：
+ * 三个独立端口，模拟真实设备环境：
  *   HTTP       → http://localhost:3000/api/*
- *   WebSocket  → ws://localhost:3000/ws
- *   MQTT (WSS) → ws://localhost:3000/mqtt
+ *   WebSocket  → ws://localhost:3001
+ *   MQTT (WSS) → ws://localhost:1883
  *
  * 用法：
  *   1. 首次：cd server && npm install
@@ -21,9 +21,11 @@ const http = require('http')
 const express = require('express')
 const { WebSocketServer, createWebSocketStream } = require('ws')
 const Aedes = require('aedes')
-const { buttons, getHealth } = require('./fixtures')
+const { buttons, getHealth, getHealthByProtocol, getButtonsByProtocol, allButtons } = require('./fixtures')
 
-const PORT = process.env.PORT || 3000
+const HTTP_PORT = process.env.HTTP_PORT || 3000
+const WS_PORT = process.env.WS_PORT || 3001
+const MQTT_PORT = process.env.MQTT_PORT || 1883
 const LATENCY = Number(process.env.MOCK_LATENCY || 0)
 
 /** 延迟工具 */
@@ -57,13 +59,13 @@ app.get('/api/health', (_req, res) => {
   if (process.env.MOCK_FAIL_HEALTH === '1') {
     return res.status(500).json(fail(5001, '设备离线（mock 注入失败）'))
   }
-  res.json(ok(getHealth()))
+  res.json(ok(getHealthByProtocol('http')))
 })
 
 app.get('/api/buttons', (_req, res) => {
   const forced = process.env.MOCK_FAIL_BUTTONS
   if (forced) return res.status(200).json(fail(Number(forced), '配置加载失败（mock 注入）'))
-  res.json(ok(buttons))
+  res.json(ok(getButtonsByProtocol('http')))
 })
 
 app.get('/api/trigger/:buttonId', (req, res) => {
@@ -72,11 +74,11 @@ app.get('/api/trigger/:buttonId', (req, res) => {
   if (forced) {
     return res.status(200).json(fail(Number(forced), `触发失败（mock 注入 code=${forced}）`))
   }
-  const exists = buttons.some((g) => g.buttons.some((b) => b.id === buttonId))
+  const exists = allButtons().some((g) => g.buttons.some((b) => b.id === buttonId))
   if (!exists) {
     return res.status(200).json(fail(4001, '按钮不存在'))
   }
-  res.json(ok({ success: true, buttonId, timestamp: Date.now(), message: '动作已触发（mock）' }))
+  res.json(ok({ success: true, buttonId, timestamp: Date.now(), message: '动作已触发（HTTP）' }))
 })
 
 app.use((req, res) => {
@@ -85,11 +87,14 @@ app.use((req, res) => {
 
 // ─── HTTP Server ─────────────────────────────────────────────────────
 
-const server = http.createServer(app)
+app.listen(HTTP_PORT, () => {
+  console.log(`  HTTP       : http://localhost:${HTTP_PORT}/api/health`)
+})
 
-// ─── WebSocket ───────────────────────────────────────────────────────
+// ─── WebSocket Server ───────────────────────────────────────────────
 
-const appWss = new WebSocketServer({ noServer: true })
+const wsServer = http.createServer()
+const appWss = new WebSocketServer({ server: wsServer })
 
 appWss.on('connection', (ws) => {
   console.log(`[${ts()}] WS    客户端已连接`)
@@ -107,7 +112,7 @@ appWss.on('connection', (ws) => {
 
     if (LATENCY > 0) await delay(LATENCY)
 
-    const response = { id: msg.id, type: msg.type, payload: handleCommand(msg.type, msg.payload) }
+    const response = { id: msg.id, type: msg.type, payload: handleCommand('ws', msg.type, msg.payload) }
     ws.send(JSON.stringify(response))
     console.log(`[${ts()}] WS    → ${msg.type} (id=${msg.id})`)
   })
@@ -117,11 +122,15 @@ appWss.on('connection', (ws) => {
   })
 })
 
+wsServer.listen(WS_PORT, () => {
+  console.log(`  WebSocket  : ws://localhost:${WS_PORT}`)
+})
+
 // ─── MQTT Broker ─────────────────────────────────────────────────────
 
+const mqttServer = http.createServer()
 const broker = Aedes()
-
-const mqttWss = new WebSocketServer({ noServer: true })
+const mqttWss = new WebSocketServer({ server: mqttServer })
 
 mqttWss.on('connection', (ws) => {
   const duplex = createWebSocketStream(ws, { binary: true })
@@ -154,7 +163,7 @@ broker.on('publish', async (packet, client) => {
 
   if (LATENCY > 0) await delay(LATENCY)
 
-  const responsePayload = handleCommand(actionToType(action), extractMqttPayload(action, msg))
+  const responsePayload = handleCommand('mqtt', actionToType(action), extractMqttPayload(action, msg))
   const responseTopic = `led/response/${action}/${msg.id}`
 
   broker.publish(
@@ -170,21 +179,26 @@ broker.on('publish', async (packet, client) => {
   )
 })
 
+mqttServer.listen(MQTT_PORT, () => {
+  console.log(`  MQTT (WS)  : ws://localhost:${MQTT_PORT}`)
+})
+
 // ─── 共享命令处理 ────────────────────────────────────────────────────
 
-function handleCommand(type, payload) {
+function handleCommand(protocol, type, payload) {
+  const label = { http: 'HTTP', ws: 'WebSocket', mqtt: 'MQTT' }[protocol] || protocol
   switch (type) {
     case 'GET_HEALTH': {
       if (process.env.MOCK_FAIL_HEALTH === '1') {
         return { status: 'offline', uptime: 0, lastCheck: Date.now() }
       }
-      return getHealth()
+      return getHealthByProtocol(protocol)
     }
     case 'GET_BUTTONS': {
       if (process.env.MOCK_FAIL_BUTTONS) {
         return []
       }
-      return buttons
+      return getButtonsByProtocol(protocol)
     }
     case 'TRIGGER_ACTION': {
       const buttonId = payload && payload.buttonId
@@ -194,11 +208,11 @@ function handleCommand(type, payload) {
       if (!buttonId) {
         return { success: false, buttonId: '', timestamp: Date.now(), message: '参数错误：缺少 buttonId' }
       }
-      const exists = buttons.some((g) => g.buttons.some((b) => b.id === buttonId))
+      const exists = allButtons().some((g) => g.buttons.some((b) => b.id === buttonId))
       if (!exists) {
         return { success: false, buttonId, timestamp: Date.now(), message: '按钮不存在' }
       }
-      return { success: true, buttonId, timestamp: Date.now(), message: '动作已触发（mock）' }
+      return { success: true, buttonId, timestamp: Date.now(), message: `动作已触发（${label}）` }
     }
     default:
       return { error: `未知命令: ${type}` }
@@ -221,52 +235,28 @@ function extractMqttPayload(action, msg) {
   return msg.payload || {}
 }
 
-// ─── Upgrade 分发 ────────────────────────────────────────────────────
-
-server.on('upgrade', (request, socket, head) => {
-  const pathname = new URL(request.url, 'http://localhost').pathname
-
-  if (pathname === '/ws') {
-    appWss.handleUpgrade(request, socket, head, (ws) => {
-      appWss.emit('connection', ws, request)
-    })
-  } else if (pathname === '/mqtt') {
-    mqttWss.handleUpgrade(request, socket, head, (ws) => {
-      mqttWss.emit('connection', ws, request)
-    })
-  } else {
-    socket.destroy()
-  }
-})
-
-// ─── 启动 ────────────────────────────────────────────────────────────
+// ─── 工具 ────────────────────────────────────────────────────────────
 
 function ts() {
   return new Date().toISOString()
 }
 
-server.listen(PORT, () => {
-  console.log('============================================')
-  console.log(`  AnyCtrl Mock Server`)
-  console.log('--------------------------------------------')
-  console.log(`  HTTP       : http://localhost:${PORT}/api/health`)
-  console.log(`  WebSocket  : ws://localhost:${PORT}/ws`)
-  console.log(`  MQTT (WS)  : ws://localhost:${PORT}/mqtt`)
-  console.log('--------------------------------------------')
-  console.log('  HTTP 端点:')
-  console.log(`    GET /api/health`)
-  console.log(`    GET /api/buttons`)
-  console.log(`    GET /api/trigger/:buttonId`)
-  console.log('  WS 命令:')
-  console.log(`    GET_HEALTH / GET_BUTTONS / TRIGGER_ACTION`)
-  console.log('  MQTT Topic:')
-  console.log(`    请求 → led/request/{action}`)
-  console.log(`    响应 ← led/response/{action}/{requestId}`)
-  console.log('--------------------------------------------')
-  console.log('  错误注入环境变量:')
-  console.log('    MOCK_FAIL_HEALTH=1        health 失败')
-  console.log('    MOCK_FAIL_BUTTONS=5002    buttons 失败')
-  console.log('    MOCK_TRIGGER_FAIL=4001    trigger 全失败')
-  console.log('    MOCK_LATENCY=1000         全部延迟 1s')
-  console.log('============================================')
-})
+console.log('============================================')
+console.log('  AnyCtrl Mock Server')
+console.log('--------------------------------------------')
+console.log('  HTTP 端点:')
+console.log('    GET /api/health')
+console.log('    GET /api/buttons')
+console.log('    GET /api/trigger/:buttonId')
+console.log('  WS 命令:')
+console.log('    GET_HEALTH / GET_BUTTONS / TRIGGER_ACTION')
+console.log('  MQTT Topic:')
+console.log('    请求 → led/request/{action}')
+console.log('    响应 ← led/response/{action}/{requestId}')
+console.log('--------------------------------------------')
+console.log('  错误注入环境变量:')
+console.log('    MOCK_FAIL_HEALTH=1        health 失败')
+console.log('    MOCK_FAIL_BUTTONS=5002    buttons 失败')
+console.log('    MOCK_TRIGGER_FAIL=4001    trigger 全失败')
+console.log('    MOCK_LATENCY=1000         全部延迟 1s')
+console.log('============================================')

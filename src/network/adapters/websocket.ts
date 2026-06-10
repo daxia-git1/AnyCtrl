@@ -28,7 +28,7 @@ export class WsAdapter implements IProtocolAdapter {
     this.setStatus('connecting')
 
     return new Promise((resolve, reject) => {
-      this.socket = Taro.connectSocket({
+      const task = Taro.connectSocket({
         url: config.wsUrl,
         success: () => {},
         fail: (err) => {
@@ -37,26 +37,34 @@ export class WsAdapter implements IProtocolAdapter {
         },
       })
 
-      this.socket.onOpen(() => {
-        this.setStatus('connected')
-        resolve()
-      })
+      const bindEvents = (st: Taro.SocketTask) => {
+        this.socket = st
+        st.onOpen(() => {
+          this.setStatus('connected')
+          resolve()
+        })
+        st.onMessage((msg) => {
+          this.handleMessage(msg.data as string)
+        })
+        st.onClose(() => {
+          this.setStatus('disconnected')
+          this.rejectAllPending('连接已关闭')
+          this.scheduleReconnect(config)
+        })
+        st.onError(() => {
+          this.setStatus('error')
+          this.rejectAllPending('连接错误')
+        })
+      }
 
-      this.socket.onMessage((msg) => {
-        this.handleMessage(msg.data as string)
-      })
-
-      this.socket.onClose(() => {
-        this.setStatus('disconnected')
-        this.rejectAllPending('连接已关闭')
-        // 自动重连
-        this.scheduleReconnect(config)
-      })
-
-      this.socket.onError(() => {
-        this.setStatus('error')
-        this.rejectAllPending('连接错误')
-      })
+      if (task && typeof (task as any).onOpen === 'function') {
+        bindEvents(task as Taro.SocketTask)
+      } else if (task && typeof (task as any).then === 'function') {
+        ;(task as unknown as Promise<Taro.SocketTask>).then(bindEvents).catch((err) => {
+          this.setStatus('error')
+          reject(err)
+        })
+      }
     })
   }
 
