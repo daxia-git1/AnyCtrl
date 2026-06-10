@@ -43,15 +43,25 @@ export class MqttAdapter implements IProtocolAdapter {
       })
 
       return new Promise((resolve, reject) => {
-        this.client.on('connect', () => {
-          this.setStatus('connected')
-          // 订阅响应主题
-          this.client.subscribe(`${this.RESPONSE_TOPIC}/#`, (err: Error | null) => {
-            if (err) {
-              console.warn('[MqttAdapter] 订阅失败:', err)
-            }
+        let settled = false
+        const settle = (fn: () => void) => { if (!settled) { settled = true; fn() } }
+
+        const timeout = setTimeout(() => {
+          settle(() => {
+            this.setStatus('error')
+            reject(new Error('MQTT 连接超时'))
           })
-          resolve()
+        }, 8000)
+
+        this.client.on('connect', () => {
+          clearTimeout(timeout)
+          settle(() => {
+            this.setStatus('connected')
+            this.client.subscribe(`${this.RESPONSE_TOPIC}/#`, (err: Error | null) => {
+              if (err) console.warn('[MqttAdapter] 订阅失败:', err)
+            })
+            resolve()
+          })
         })
 
         this.client.on('message', (topic: string, message: Buffer) => {
@@ -59,8 +69,11 @@ export class MqttAdapter implements IProtocolAdapter {
         })
 
         this.client.on('error', (err: Error) => {
-          this.setStatus('error')
-          reject(new Error(`MQTT 连接错误: ${err.message}`))
+          clearTimeout(timeout)
+          settle(() => {
+            this.setStatus('error')
+            reject(new Error(`MQTT 连接错误: ${err.message}`))
+          })
         })
 
         this.client.on('close', () => {
