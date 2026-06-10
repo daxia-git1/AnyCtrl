@@ -198,6 +198,7 @@ pnpm build:rn          # App
 | [HTTP API](docs/api-contract-http.md) | HTTP REST 接口详细说明 |
 | [WebSocket API](docs/api-contract-websocket.md) | WebSocket 消息协议说明 |
 | [MQTT API](docs/api-contract-mqtt.md) | MQTT Topic 与消息格式 |
+| [MQTT 协议选择](docs/mqtt-ws-scheme.md) | ws/wss 自动检测逻辑与连接排查 |
 | [版本变更](docs/CHANGELOG.md) | 版本升级记录与配置备忘 |
 
 ## 界面展示

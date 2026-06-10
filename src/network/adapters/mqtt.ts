@@ -29,7 +29,8 @@ export class MqttAdapter implements IProtocolAdapter {
       const mqttModule = await import('mqtt')
       const mqtt = (mqttModule as any).default || mqttModule
 
-      const scheme = config.mqttHost === 'localhost' || config.mqttHost === '127.0.0.1' ? 'ws' : 'wss'
+      const isLocal = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(config.mqttHost)
+      const scheme = isLocal ? 'ws' : 'wss'
       const brokerUrl = `${scheme}://${config.mqttHost}:${config.mqttPort}/mqtt`
 
       this.client = mqtt.connect(brokerUrl, {
