@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { View, Text, Input, Slider, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { Link, Internation, Mail, Refresh, Success, Eye } from '@nutui/icons-react-taro'
+import pkg from '../../../package.json'
 import { useAppStore } from '../../store/useAppStore'
 import { ConnectionBar } from '../../components/ConnectionBar'
 import { ProtocolSwitch } from '../../components/ProtocolSwitch'
@@ -340,7 +341,7 @@ export default function SettingsPage() {
           {/* 版权信息 */}
           <View className="settings-page__copyright">
             <Text className="settings-page__copyright-text">AnyCtrl · AntsTeam</Text>
-            <Text className="settings-page__copyright-version">v1.0.2</Text>
+            <Text className="settings-page__copyright-version">v{pkg.version}</Text>
           </View>
         </View>
       </ScrollView>

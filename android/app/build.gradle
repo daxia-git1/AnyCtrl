@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+def packageJsonText = file("../../package.json").text
+def versionMatcher = (packageJsonText =~ /"version"\s*:\s*"(\d+)\.(\d+)\.(\d+)"/)
+def appVersionName = "${versionMatcher[0][1]}.${versionMatcher[0][2]}.${versionMatcher[0][3]}"
+def appVersionCode = versionMatcher[0][1].toInteger() * 10000 + versionMatcher[0][2].toInteger() * 100 + versionMatcher[0][3].toInteger()
+
 android {
     namespace "com.anyctrl.panel"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +12,8 @@ android {
         applicationId "com.anyctrl.panel"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode appVersionCode
+        versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
