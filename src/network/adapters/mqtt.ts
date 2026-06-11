@@ -56,13 +56,11 @@ export class MqttAdapter implements IProtocolAdapter {
 
         this.client.on('connect', () => {
           clearTimeout(timeout)
-          settle(() => {
-            this.setStatus('connected')
-            this.client.subscribe(`${this.RESPONSE_TOPIC}/#`, (err: Error | null) => {
-              if (err) console.warn('[MqttAdapter] 订阅失败:', err)
-            })
-            resolve()
+          this.setStatus('connected')
+          this.client.subscribe(`${this.RESPONSE_TOPIC}/#`, (err: Error | null) => {
+            if (err) console.warn('[MqttAdapter] 订阅失败:', err)
           })
+          settle(() => resolve())
         })
 
         this.client.on('message', (topic: string, message: Buffer) => {
@@ -79,10 +77,12 @@ export class MqttAdapter implements IProtocolAdapter {
 
         this.client.on('close', () => {
           this.setStatus('disconnected')
+          this.rejectAllPending('连接已关闭')
         })
 
         this.client.on('offline', () => {
           this.setStatus('disconnected')
+          this.rejectAllPending('连接已关闭')
         })
       })
     } catch (err) {
@@ -96,8 +96,7 @@ export class MqttAdapter implements IProtocolAdapter {
       this.client.end(true)
       this.client = null
     }
-    this.pendingRequests.forEach(({ reject }) => reject(new Error('主动断开连接')))
-    this.pendingRequests.clear()
+    this.rejectAllPending('主动断开连接')
     this.setStatus('disconnected')
   }
 
@@ -190,6 +189,14 @@ export class MqttAdapter implements IProtocolAdapter {
     } catch {
       console.warn('[MqttAdapter] 无法解析消息:', topic, message)
     }
+  }
+
+  private rejectAllPending(reason: string): void {
+    this.pendingRequests.forEach(({ reject, topic }) => {
+      this.client?.unsubscribe(topic)
+      reject(new Error(reason))
+    })
+    this.pendingRequests.clear()
   }
 
   private setStatus(status: ConnStatus): void {

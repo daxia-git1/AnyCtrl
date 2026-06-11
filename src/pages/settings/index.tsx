@@ -38,7 +38,7 @@ export default function SettingsPage() {
   // 是否有未保存的修改
   const [hasChanges, setHasChanges] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(true)
 
   useEffect(() => {
     restoreSettings()
@@ -237,7 +237,7 @@ export default function SettingsPage() {
                   <Eye width={16} height={16} color={showAdvanced ? '#6366f1' : '#94a3b8'} />
                 </View>
                 <Text className="settings-page__toggle-text" style={`color: ${showAdvanced ? '#6366f1' : '#94a3b8'}`}>
-                  {showAdvanced ? '收起' : '展开'}
+                  {showAdvanced ? '显示' : '隐藏'}
                 </Text>
               </View>
             </Text>
