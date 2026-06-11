@@ -35,6 +35,8 @@ interface AppState {
   // ========== 内部 ==========
   /** 当前适配器实例 */
   _adapter: MockInterceptor | null
+  /** 健康检查定时器 */
+  _healthTimer: ReturnType<typeof setInterval> | null
 
   // ========== Actions ==========
   /** 设置协议类型 */
@@ -75,6 +77,7 @@ const defaultConfig: ConnectionConfig = {
   mqttPort: 1883,
   username: '',
   password: '',
+  healthInterval: 60,
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -90,6 +93,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   loading: false,
   error: null,
   _adapter: null,
+  _healthTimer: null,
 
   // ========== Actions ==========
 
@@ -123,20 +127,22 @@ export const useAppStore = create<AppState>((set, get) => ({
   initAdapter: async () => {
     const { protocol, connectionConfig, mockEnabled } = get()
 
-    // 销毁旧适配器（断开连接 + 清除监听器，防止内存泄漏）
+    // 销毁旧适配器和定时器
     const oldAdapter = get()._adapter
+    const oldTimer = get()._healthTimer
+    if (oldTimer) clearInterval(oldTimer)
     if (oldAdapter) {
       oldAdapter.disconnect()
       oldAdapter.removeAllStatusListeners()
     }
 
-    // 清空旧业务数据（避免上一协议 / Mock 的旧数据在新连接失败时残留误导）
     set({
       healthStatus: null,
       tagGroups: [],
       connectionStatus: 'connecting',
       loading: true,
       error: null,
+      _healthTimer: null,
     })
 
     try {
@@ -151,6 +157,11 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       // 自动加载数据
       await Promise.all([get().checkHealth(), get().refreshButtons()])
+
+      // 启动健康轮询
+      const interval = (get().connectionConfig.healthInterval || 60) * 1000
+      const timer = setInterval(() => { get().checkHealth() }, interval)
+      set({ _healthTimer: timer })
     } catch (err) {
       const message = err instanceof Error ? err.message : '初始化失败'
       // 失败时显式标记设备"离线"——避免用户看到上一协议/Mock 留下的"在线"假数据
@@ -177,13 +188,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     try {
       const health = await adapter.getHealth()
-      set({ healthStatus: { ...health, stale: false } })
+      set({ healthStatus: { ...health, stale: false }, connectionStatus: 'connected' })
     } catch (err) {
       // 降级处理：保留上一次健康数据，但标记为"陈旧" + warning 状态
       // 这样 UI 不会突然消失（特别是首页"运行 X 天"），同时给用户可见反馈
       const prev = get().healthStatus
       const message = err instanceof Error ? err.message : '健康检查失败'
       console.error('[Store] 健康检查失败:', err)
+      set({ connectionStatus: 'error' })
       if (prev) {
         set({
           healthStatus: {

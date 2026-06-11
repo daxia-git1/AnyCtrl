@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View, Text, Input, Slider, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { Link, Internation, Mail, Refresh, Success, Tips } from '@nutui/icons-react-taro'
+import { Link, Internation, Mail, Refresh, Success, Eye } from '@nutui/icons-react-taro'
 import { useAppStore } from '../../store/useAppStore'
 import { ConnectionBar } from '../../components/ConnectionBar'
 import { ProtocolSwitch } from '../../components/ProtocolSwitch'
@@ -37,6 +37,7 @@ export default function SettingsPage() {
   // 是否有未保存的修改
   const [hasChanges, setHasChanges] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   useEffect(() => {
     restoreSettings()
@@ -223,48 +224,87 @@ export default function SettingsPage() {
             </View>
           </View>
 
-          {/* 字体大小调节 */}
+          {/* 高级设置 */}
           <View className="settings-page__section">
-            <Text className="settings-page__section-title">
-              <Tips width={20} height={20} color="#6366f1" />
-              字体大小
+            <Text
+              className="settings-page__section-title settings-page__section-title--toggle"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              高级设置
+              <View className="settings-page__toggle-icon">
+                <View className={`settings-page__eye${showAdvanced ? '' : ' settings-page__eye--closed'}`}>
+                  <Eye width={16} height={16} color={showAdvanced ? '#6366f1' : '#94a3b8'} />
+                </View>
+                <Text className="settings-page__toggle-text" style={`color: ${showAdvanced ? '#6366f1' : '#94a3b8'}`}>
+                  {showAdvanced ? '收起' : '展开'}
+                </Text>
+              </View>
             </Text>
-            <View className="settings-page__font-card">
-              <View className="settings-page__font-preview">
-                <Text
-                  className="settings-page__font-preview-text"
-                  style={`font-size: calc(28px * ${FONT_SCALE_MAP[fontSizeLevel]})`}
-                >
-                  Aa
-                </Text>
-                <Text className="settings-page__font-current">
-                  {FONT_SIZE_LABELS[fontSizeLevel]}
-                </Text>
-              </View>
-              <View className="settings-page__font-slider">
-                <Slider
-                  step={1}
-                  min={0}
-                  max={3}
-                  value={FONT_SIZE_OPTIONS.indexOf(fontSizeLevel)}
-                  activeColor="#6366f1"
-                  backgroundColor="#e2e8f0"
-                  blockSize={20}
-                  onChange={handleFontSizeChange}
-                />
-              </View>
-              <View className="settings-page__font-labels">
-                {FONT_SIZE_OPTIONS.map((level) => (
-                  <Text
-                    key={level}
-                    className={`settings-page__font-label${fontSizeLevel === level ? ' settings-page__font-label--active' : ''}`}
-                    onClick={() => setFontSizeLevel(level)}
-                  >
-                    {FONT_SIZE_LABELS[level]}
-                  </Text>
-                ))}
-              </View>
-            </View>
+            {showAdvanced && (
+              <>
+                <View className="settings-page__form" style="margin-bottom: 16px">
+                  <View className="settings-page__field">
+                    <Text className="settings-page__label">
+                      <Text>连接状态监测间隔</Text>
+                    </Text>
+                    <View className="settings-page__interval-group">
+                      {[
+                        { value: 10, label: '10s', desc: '灵敏' },
+                        { value: 30, label: '30s', desc: '标准' },
+                        { value: 60, label: '60s', desc: '默认' },
+                        { value: 300, label: '5min', desc: '省电' },
+                        { value: 600, label: '10min', desc: '超省电' },
+                      ].map((opt) => (
+                        <View
+                          key={opt.value}
+                          className={`settings-page__interval-btn${(connectionConfig.healthInterval || 60) === opt.value ? ' settings-page__interval-btn--active' : ''}`}
+                          onClick={() => { handleConfigChange({ healthInterval: opt.value }); }}
+                        >
+                          <Text className="settings-page__interval-value">{opt.label}</Text>
+                          <Text className="settings-page__interval-desc">{opt.desc}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                <View className="settings-page__font-card">
+                  <View className="settings-page__font-preview">
+                    <Text
+                      className="settings-page__font-preview-text"
+                      style={`font-size: calc(28px * ${FONT_SCALE_MAP[fontSizeLevel]})`}
+                    >
+                      Aa
+                    </Text>
+                    <Text className="settings-page__font-current">
+                      {FONT_SIZE_LABELS[fontSizeLevel]}
+                    </Text>
+                  </View>
+                  <View className="settings-page__font-slider">
+                    <Slider
+                      step={1}
+                      min={0}
+                      max={3}
+                      value={FONT_SIZE_OPTIONS.indexOf(fontSizeLevel)}
+                      activeColor="#6366f1"
+                      backgroundColor="#e2e8f0"
+                      blockSize={20}
+                      onChange={handleFontSizeChange}
+                    />
+                  </View>
+                  <View className="settings-page__font-labels">
+                    {FONT_SIZE_OPTIONS.map((level) => (
+                      <Text
+                        key={level}
+                        className={`settings-page__font-label${fontSizeLevel === level ? ' settings-page__font-label--active' : ''}`}
+                        onClick={() => setFontSizeLevel(level)}
+                      >
+                        {FONT_SIZE_LABELS[level]}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+              </>
+            )}
           </View>
 
           {/* 保存 / 重置 按钮 */}

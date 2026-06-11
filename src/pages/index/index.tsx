@@ -18,20 +18,12 @@ export default function IndexPage() {
     loading,
     error,
     restoreSettings,
-    checkHealth,
     refreshButtons,
     fontSizeLevel,
   } = useAppStore()
 
   useEffect(() => {
     restoreSettings()
-  }, [])
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      checkHealth()
-    }, 30000)
-    return () => clearInterval(timer)
   }, [])
 
   const totalButtons = tagGroups.reduce((sum, g) => sum + g.buttons.length, 0)

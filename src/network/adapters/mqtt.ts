@@ -38,6 +38,7 @@ export class MqttAdapter implements IProtocolAdapter {
         password: config.password,
         clientId: `led_panel_${Date.now()}`,
         clean: true,
+        keepalive: config.healthInterval || 60,
         connectTimeout: 5000,
         reconnectPeriod: 3000,
       })

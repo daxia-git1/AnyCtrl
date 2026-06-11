@@ -48,6 +48,8 @@ export interface ConnectionConfig {
   username?: string
   /** 密码 */
   password?: string
+  /** 健康检查间隔（秒），默认 60 */
+  healthInterval?: number
 }
 
 /** 动作触发结果 */
