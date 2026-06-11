@@ -340,7 +340,7 @@ export default function SettingsPage() {
           {/* 版权信息 */}
           <View className="settings-page__copyright">
             <Text className="settings-page__copyright-text">AnyCtrl · AntsTeam</Text>
-            <Text className="settings-page__copyright-version">v1.0.1</Text>
+            <Text className="settings-page__copyright-version">v1.0.2</Text>
           </View>
         </View>
       </ScrollView>

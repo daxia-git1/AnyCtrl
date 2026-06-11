@@ -1,6 +1,6 @@
 {
   "name": "anyctrl",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "AnyCtrl 控制面板 - 支持 H5/小程序/App 的跨端控制应用",
   "license": "MIT",
