@@ -1,0 +1,42 @@
+name: Build Desktop Exe
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm via corepack
+        run: corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build H5
+        run: pnpm build:h5
+
+      - name: Build Electron exe
+        run: npx electron-builder --win
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: anyctrl-desktop
+          path: release/AnyCtrl Setup *.exe
+          retention-days: 30

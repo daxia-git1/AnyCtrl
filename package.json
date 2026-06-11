@@ -2,6 +2,7 @@
   "name": "anyctrl",
   "version": "1.0.2",
   "private": true,
+  "main": "desktop/main.js",
   "description": "AnyCtrl 控制面板 - 支持 H5/小程序/App 的跨端控制应用",
   "license": "MIT",
   "templateInfo": {
@@ -13,11 +14,11 @@
   "scripts": {
     "build:weapp": "taro build --type weapp",
     "build:h5": "taro build --type h5",
-    "build:rn": "taro build --type rn",
     "build:android": "pnpm build:h5 && npx cap sync android && cd android && gradlew.bat assembleDebug",
+    "build:desktop": "pnpm build:h5 && electron-builder --win",
     "dev:weapp": "pnpm build:weapp -- --watch",
     "dev:h5": "pnpm build:h5 -- --watch",
-    "dev:rn": "pnpm build:rn -- --watch"
+    "dev:desktop": "pnpm build:h5 && node desktop/start.js"
   },
   "browserslist": [
     "last 3 versions",
@@ -58,6 +59,8 @@
     "@tarojs/webpack5-runner": "4.0.9",
     "@types/react": "^18.2.0",
     "babel-preset-taro": "4.0.9",
+    "electron": "31",
+    "electron-builder": "^26.15.2",
     "eslint": "^8.41.0",
     "eslint-config-taro": "4.0.9",
     "react-refresh": "^0.14.2",
@@ -65,5 +68,25 @@
     "sharp": "^0.34.5",
     "typescript": "^5.1.0",
     "webpack": "5.91.0"
+  },
+  "build": {
+    "appId": "com.anyctrl.desktop",
+    "productName": "AnyCtrl",
+    "npmRebuild": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "desktop/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

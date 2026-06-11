@@ -5,6 +5,9 @@ node_modules/
 # Taro 构建产物
 dist/
 
+# Electron 构建产物
+release/
+
 # Capacitor
 .capacitor/
 

@@ -60,3 +60,13 @@ AnyCtrl 采用 **Taro H5 + Capacitor** 方案打包 Android App，而非 React N
 - 大数据量长列表需要原生级虚拟滚动
 - 深度依赖原生硬件能力（蓝牙、NFC、AR）
 - 对启动速度和内存占用有严格要求
+
+## H5 的打包方案
+
+| 目标平台 | 方案 | 前提条件 | 状态 |
+|----------|------|----------|------|
+| Android | Capacitor | Android Studio + SDK | 已支持 |
+| iOS | Capacitor | Mac + Xcode，`npx cap add ios` | 待接入 |
+| Windows 桌面 | Electron | 无额外环境要求 | 已支持 |
+| Mac 桌面 | Electron / Tauri | Electron 跨平台通用；Tauri 需 Rust 环境 | 待接入 |
+| 鸿蒙 | Taro 实验性支持 | DevEco Studio，Capacitor 暂不支持 | 生态不成熟 |

@@ -43,7 +43,7 @@ export default defineConfig(async (merge) => {
       },
     },
     h5: {
-      publicPath: '/',
+      publicPath: './',
       staticDirectory: 'static',
       postcss: {
         autoprefixer: {
@@ -56,14 +56,6 @@ export default defineConfig(async (merge) => {
             namingPattern: 'module',
             generateScopedName: '[name]__[local]___[hash:base64:5]',
           },
-        },
-      },
-    },
-    rn: {
-      appName: 'ledControlPanel',
-      postcss: {
-        cssModules: {
-          enable: false,
         },
       },
     },
