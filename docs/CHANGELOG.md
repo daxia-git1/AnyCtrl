@@ -47,6 +47,7 @@
 
 ### 文档
 
+- 新增 `docs/tech-selection.md`：H5 + Capacitor vs React Native 选型分析及各平台打包方案
 - 新增 `docs/mqtt-ws-scheme.md`：ws/wss 自动检测逻辑说明与排障指南
 
 ---
