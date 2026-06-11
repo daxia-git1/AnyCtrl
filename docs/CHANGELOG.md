@@ -18,6 +18,14 @@
 
 ### 新增
 
+- **Windows 桌面 exe 打包**
+  基于 Electron 31 将 H5 产物打包为 Windows 桌面应用，
+  `pnpm dev:desktop` 开发调试，`pnpm build:desktop` 输出 NSIS 安装包（~107MB）。
+
+- **GitHub Actions 桌面构建流水线**
+  `.github/workflows/build-desktop.yml`，push 到 main/master 自动构建，
+  产物上传至 Actions Artifacts 供下载。
+
 - **健康检查统一轮询**
   从页面级 `setInterval` 移至 store 层 `initAdapter()` 统一管理，
   三种协议均支持断线检测，切换页面不中断轮询。
