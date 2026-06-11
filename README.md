@@ -185,6 +185,12 @@ pnpm build:h5          # H5
 pnpm build:desktop     # Windows 桌面 exe（Electron）
 ```
 
+## 发布生产新Tag
+```bash
+git tag v1.0.2
+git push origin v1.0.2
+```
+
 ## 文档
 
 | 文档 | 说明 |
