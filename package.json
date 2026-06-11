@@ -81,12 +81,16 @@
       "desktop/**/*"
     ],
     "win": {
-      "target": "nsis",
+      "target": ["nsis", "portable"],
       "icon": "desktop/icon.png"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "AnyCtrl-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "AnyCtrl-Portable-${version}.${ext}"
     }
   }
 }

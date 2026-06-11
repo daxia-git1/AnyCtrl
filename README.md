@@ -187,8 +187,10 @@ pnpm build:desktop     # Windows 桌面 exe（Electron）
 
 ## 发布生产新Tag
 ```bash
-git tag v1.0.2
-git push origin v1.0.2
+git push origin :refs/tags/v1.0.2   # 删除远程旧 tag
+git tag -d v1.0.2                   # 删除本地旧 tag
+git tag v1.0.2                      # 重新打 tag
+git push origin v1.0.2              # 推送新 tag
 ```
 
 ## 文档
